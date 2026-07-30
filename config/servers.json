@@ -1,0 +1,31 @@
+{
+  "servers": [
+    {
+      "name": "filesystem",
+      "transport": "stdio",
+      "enabled": true,
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "./workspace"]
+    },
+    {
+      "name": "git",
+      "transport": "stdio",
+      "enabled": true,
+      "command": "python",
+      "args": ["-m", "mcp_server_git"]
+    },
+    {
+      "name": "pharmacy",
+      "transport": "stdio",
+      "enabled": true,
+      "command": "python",
+      "args": ["-m", "src.servers.pharmacy.stdio_server"]
+    },
+    {
+      "name": "pharmacy-remote",
+      "transport": "http",
+      "enabled": false,
+      "url": "https://your-cloud-run-service.a.run.app/mcp"
+    }
+  ]
+}

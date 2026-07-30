@@ -216,3 +216,14 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Project-specific
+logs/*
+!logs/.gitkeep
+!logs/sample-*.jsonl
+captures/*
+!captures/.gitkeep
+!captures/*.md
+workspace/*
+!workspace/.gitkeep
+sslkeys.log
