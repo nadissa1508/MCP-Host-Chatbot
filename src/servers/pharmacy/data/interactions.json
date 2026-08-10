@@ -1,0 +1,10 @@
+{
+  "rules": [
+    { "pair": ["paracetamol", "warfarin"], "severity": "warning", "description": "Regular paracetamol use may enhance warfarin's anticoagulant effect." },
+    { "pair": ["ibuprofen", "warfarin"], "severity": "blocking", "description": "NSAIDs combined with warfarin significantly increase bleeding risk." },
+    { "pair": ["ibuprofen", "losartan"], "severity": "warning", "description": "NSAIDs may reduce the antihypertensive effect of losartan and stress the kidneys." },
+    { "pair": ["pseudoephedrine", "losartan"], "severity": "blocking", "description": "Decongestants can raise blood pressure, counteracting antihypertensive treatment." },
+    { "pair": ["diphenhydramine", "loratadine"], "severity": "warning", "description": "Combining two antihistamines increases sedation without added benefit." },
+    { "pair": ["ibuprofen", "omeprazole"], "severity": "warning", "description": "Reduced but not eliminated GI risk; monitor for stomach discomfort." }
+  ]
+}

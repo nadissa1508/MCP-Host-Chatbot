@@ -1,0 +1,34 @@
+{
+  "branches": [
+    {
+      "id": "zona10",
+      "name": "Farmacia Central Zona 10",
+      "address": "12 Calle 1-25, Zona 10, Guatemala City",
+      "stock": {
+        "PARA500": 120, "IBU400": 40, "LORA10": 35, "DIPH25": 20,
+        "PSEUDO60": 15, "OMEP20": 50, "LOPER2": 25, "AMOX500": 10,
+        "WARF5": 8, "LOSAR50": 12
+      }
+    },
+    {
+      "id": "zona1",
+      "name": "Farmacia Centro Historico",
+      "address": "6a Avenida 8-12, Zona 1, Guatemala City",
+      "stock": {
+        "PARA500": 60, "IBU400": 0, "LORA10": 10, "DIPH25": 5,
+        "PSEUDO60": 0, "OMEP20": 20, "LOPER2": 12, "AMOX500": 4,
+        "WARF5": 0, "LOSAR50": 6
+      }
+    },
+    {
+      "id": "mixco",
+      "name": "Farmacia Mixco Plaza",
+      "address": "Calzada Roosevelt 22-50, Mixco",
+      "stock": {
+        "PARA500": 80, "IBU400": 25, "LORA10": 0, "DIPH25": 15,
+        "PSEUDO60": 10, "OMEP20": 30, "LOPER2": 0, "AMOX500": 6,
+        "WARF5": 3, "LOSAR50": 0
+      }
+    }
+  ]
+}

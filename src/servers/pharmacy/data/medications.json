@@ -1,0 +1,184 @@
+{
+  "medications": [
+    {
+      "sku": "PARA500",
+      "name": "Paracetamol 500mg",
+      "active_ingredient": "paracetamol",
+      "therapeutic_class": "analgesic",
+      "otc": true,
+      "presentation": "Tablets, box of 20",
+      "dosage": {
+        "adult": "1 tablet (500mg) every 6-8 hours, maximum 4 tablets per day",
+        "pediatric": "Consult a pediatrician for patients under 12 years old",
+        "max_days_without_consult": 5
+      },
+      "contraindications": ["severe liver disease"],
+      "allergy_tags": ["paracetamol"],
+      "side_effects": ["nausea (rare)", "liver toxicity in case of overdose"],
+      "pregnancy_safe": true,
+      "price": 25.5
+    },
+    {
+      "sku": "IBU400",
+      "name": "Ibuprofen 400mg",
+      "active_ingredient": "ibuprofen",
+      "therapeutic_class": "analgesic",
+      "otc": true,
+      "presentation": "Tablets, box of 20",
+      "dosage": {
+        "adult": "1 tablet (400mg) every 8 hours with food, maximum 3 tablets per day",
+        "pediatric": "Consult a pediatrician for patients under 12 years old",
+        "max_days_without_consult": 5
+      },
+      "contraindications": ["peptic ulcer", "severe kidney disease", "third trimester of pregnancy"],
+      "allergy_tags": ["ibuprofen", "nsaid"],
+      "side_effects": ["stomach irritation", "increased bleeding risk"],
+      "pregnancy_safe": false,
+      "price": 32.0
+    },
+    {
+      "sku": "LORA10",
+      "name": "Loratadine 10mg",
+      "active_ingredient": "loratadine",
+      "therapeutic_class": "antihistamine",
+      "otc": true,
+      "presentation": "Tablets, box of 10",
+      "dosage": {
+        "adult": "1 tablet (10mg) once daily",
+        "pediatric": "Half tablet daily for children 6-12 years old",
+        "max_days_without_consult": 10
+      },
+      "contraindications": [],
+      "allergy_tags": ["loratadine", "antihistamine"],
+      "side_effects": ["mild drowsiness", "dry mouth"],
+      "pregnancy_safe": true,
+      "price": 28.75
+    },
+    {
+      "sku": "DIPH25",
+      "name": "Diphenhydramine 25mg",
+      "active_ingredient": "diphenhydramine",
+      "therapeutic_class": "antihistamine",
+      "otc": true,
+      "presentation": "Tablets, box of 12",
+      "dosage": {
+        "adult": "1 tablet (25mg) every 6-8 hours, maximum 4 tablets per day",
+        "pediatric": "Not recommended under 6 years old",
+        "max_days_without_consult": 7
+      },
+      "contraindications": ["glaucoma", "urinary retention"],
+      "allergy_tags": ["diphenhydramine", "antihistamine"],
+      "side_effects": ["drowsiness", "dry mouth", "blurred vision"],
+      "pregnancy_safe": false,
+      "price": 22.0
+    },
+    {
+      "sku": "PSEUDO60",
+      "name": "Pseudoephedrine 60mg",
+      "active_ingredient": "pseudoephedrine",
+      "therapeutic_class": "decongestant",
+      "otc": true,
+      "presentation": "Tablets, box of 10",
+      "dosage": {
+        "adult": "1 tablet (60mg) every 6 hours, maximum 4 tablets per day",
+        "pediatric": "Not recommended under 12 years old",
+        "max_days_without_consult": 5
+      },
+      "contraindications": ["hypertension", "hyperthyroidism"],
+      "allergy_tags": ["pseudoephedrine"],
+      "side_effects": ["increased heart rate", "insomnia", "elevated blood pressure"],
+      "pregnancy_safe": false,
+      "price": 30.0
+    },
+    {
+      "sku": "OMEP20",
+      "name": "Omeprazole 20mg",
+      "active_ingredient": "omeprazole",
+      "therapeutic_class": "antacid",
+      "otc": true,
+      "presentation": "Capsules, box of 14",
+      "dosage": {
+        "adult": "1 capsule (20mg) once daily before breakfast",
+        "pediatric": "Not recommended without medical supervision",
+        "max_days_without_consult": 14
+      },
+      "contraindications": [],
+      "allergy_tags": ["omeprazole"],
+      "side_effects": ["headache", "mild abdominal pain"],
+      "pregnancy_safe": true,
+      "price": 45.0
+    },
+    {
+      "sku": "LOPER2",
+      "name": "Loperamide 2mg",
+      "active_ingredient": "loperamide",
+      "therapeutic_class": "antidiarrheal",
+      "otc": true,
+      "presentation": "Capsules, box of 8",
+      "dosage": {
+        "adult": "2 capsules after the first loose stool, then 1 after each subsequent one, maximum 8/day",
+        "pediatric": "Not recommended under 12 years old",
+        "max_days_without_consult": 2
+      },
+      "contraindications": ["bloody diarrhea", "high fever with diarrhea"],
+      "allergy_tags": ["loperamide"],
+      "side_effects": ["constipation", "dizziness"],
+      "pregnancy_safe": false,
+      "price": 18.5
+    },
+    {
+      "sku": "AMOX500",
+      "name": "Amoxicillin 500mg",
+      "active_ingredient": "amoxicillin",
+      "therapeutic_class": "antibiotic",
+      "otc": false,
+      "presentation": "Capsules, box of 21",
+      "dosage": {
+        "adult": "1 capsule (500mg) every 8 hours, as prescribed",
+        "pediatric": "As prescribed by a physician",
+        "max_days_without_consult": 0
+      },
+      "contraindications": ["penicillin allergy"],
+      "allergy_tags": ["amoxicillin", "penicillin"],
+      "side_effects": ["diarrhea", "rash", "nausea"],
+      "pregnancy_safe": true,
+      "price": 60.0
+    },
+    {
+      "sku": "WARF5",
+      "name": "Warfarin 5mg",
+      "active_ingredient": "warfarin",
+      "therapeutic_class": "anticoagulant",
+      "otc": false,
+      "presentation": "Tablets, box of 30",
+      "dosage": {
+        "adult": "As prescribed by a physician, individualized dosing",
+        "pediatric": "As prescribed by a physician",
+        "max_days_without_consult": 0
+      },
+      "contraindications": ["active bleeding"],
+      "allergy_tags": ["warfarin"],
+      "side_effects": ["bleeding risk", "bruising"],
+      "pregnancy_safe": false,
+      "price": 55.0
+    },
+    {
+      "sku": "LOSAR50",
+      "name": "Losartan 50mg",
+      "active_ingredient": "losartan",
+      "therapeutic_class": "antihypertensive",
+      "otc": false,
+      "presentation": "Tablets, box of 30",
+      "dosage": {
+        "adult": "As prescribed by a physician, typically once daily",
+        "pediatric": "As prescribed by a physician",
+        "max_days_without_consult": 0
+      },
+      "contraindications": ["pregnancy"],
+      "allergy_tags": ["losartan"],
+      "side_effects": ["dizziness", "elevated potassium"],
+      "pregnancy_safe": false,
+      "price": 48.0
+    }
+  ]
+}

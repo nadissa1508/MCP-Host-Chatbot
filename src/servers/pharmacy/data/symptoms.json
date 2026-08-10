@@ -1,0 +1,50 @@
+{
+  "conditions": [
+    {
+      "id": "common_cold",
+      "match_symptoms": ["runny nose", "sore throat", "cough", "sneezing", "nasal congestion", "mild headache"],
+      "therapeutic_classes": ["decongestant", "analgesic", "antihistamine"],
+      "advice": "Rest, stay hydrated and use OTC symptom relief. See a doctor if symptoms last more than 10 days or worsen."
+    },
+    {
+      "id": "tension_headache",
+      "match_symptoms": ["headache", "head pain", "tension", "eye strain"],
+      "therapeutic_classes": ["analgesic"],
+      "advice": "Rest in a quiet, dark room and consider an OTC analgesic. See a doctor if headaches are frequent, severe or sudden."
+    },
+    {
+      "id": "seasonal_allergy",
+      "match_symptoms": ["sneezing", "itchy eyes", "runny nose", "nasal congestion", "itchy throat"],
+      "therapeutic_classes": ["antihistamine", "decongestant"],
+      "advice": "An antihistamine usually controls seasonal allergy symptoms. See a doctor if it interferes with daily life."
+    },
+    {
+      "id": "mild_fever",
+      "match_symptoms": ["fever", "chills", "body ache", "muscle pain"],
+      "therapeutic_classes": ["analgesic"],
+      "advice": "Rest, fluids and an antipyretic. Seek care if fever exceeds 39.5C or lasts more than 3 days."
+    },
+    {
+      "id": "acid_reflux",
+      "match_symptoms": ["heartburn", "acid reflux", "stomach burning", "indigestion"],
+      "therapeutic_classes": ["antacid"],
+      "advice": "Avoid trigger foods and consider an OTC antacid. See a doctor if it happens more than twice a week."
+    },
+    {
+      "id": "gastrointestinal_upset",
+      "match_symptoms": ["nausea", "stomach ache", "diarrhea", "upset stomach"],
+      "therapeutic_classes": ["antidiarrheal", "antacid"],
+      "advice": "Stay hydrated with oral rehydration. See a doctor if there is blood, high fever or symptoms last more than 2 days."
+    }
+  ],
+  "red_flags": [
+    { "keyword": "chest pain", "message": "Chest pain can indicate a cardiac emergency." },
+    { "keyword": "difficulty breathing", "message": "Breathing difficulty requires immediate medical attention." },
+    { "keyword": "shortness of breath", "message": "Shortness of breath requires immediate medical attention." },
+    { "keyword": "blood", "message": "Symptoms involving blood require in-person evaluation." },
+    { "keyword": "fainting", "message": "Fainting or loss of consciousness requires immediate medical attention." },
+    { "keyword": "confusion", "message": "Sudden confusion requires immediate medical attention." },
+    { "keyword": "severe", "message": "Self-reported severe symptoms require in-person evaluation." },
+    { "keyword": "stiff neck", "message": "A stiff neck with fever can indicate meningitis and needs urgent evaluation." }
+  ]
+}
