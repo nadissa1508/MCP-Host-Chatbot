@@ -64,7 +64,7 @@ class Host:
             await client.start()
         except Exception as exc:  # noqa: BLE001 - surface any startup failure to the user
             self._connect_errors[server_config.name] = f"{type(exc).__name__}: {exc}"
-            print(f"[host] failed to start server '{server_config.name}': {exc}", file=sys.stderr)
+            print(f"[host] no se pudo iniciar el servidor '{server_config.name}': {exc}", file=sys.stderr)
             return
 
         self.clients[server_config.name] = client

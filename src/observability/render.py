@@ -9,10 +9,10 @@ from src.observability.mcp_log import LogEntry
 
 DIRECTION_ARROWS = {"send": "->", "recv": "<-"}
 KIND_LABELS = {
-    "request": "REQUEST",
-    "response": "RESPONSE",
+    "request": "SOLICITUD",
+    "response": "RESPUESTA",
     "error": "ERROR",
-    "notification": "NOTIFY",
+    "notification": "NOTIFICACIÓN",
 }
 
 
