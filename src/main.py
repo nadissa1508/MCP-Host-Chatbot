@@ -96,7 +96,11 @@ async def run() -> None:
 
 
 def main() -> None:
-    asyncio.run(run())
+    try:
+        asyncio.run(run())
+    except KeyboardInterrupt:
+        # Ctrl+C is an expected way to leave an interactive terminal program.
+        print("\nHasta luego.")
 
 
 if __name__ == "__main__":

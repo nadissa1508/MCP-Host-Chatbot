@@ -1,4 +1,7 @@
 httpx>=0.28
 rich>=13.0
+# Official third-party MCP server used by the host. The project's own MCP
+# client and pharmacy server remain implemented without an MCP SDK.
+mcp-server-git>=2025.7.1,<2027
 pytest>=8.0
 pytest-asyncio>=0.24

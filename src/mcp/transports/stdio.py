@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import asyncio
 import shutil
+import sys
 from typing import Any, Callable
 
 from src.mcp.transports.base import Transport
@@ -37,7 +38,12 @@ class StdioTransport(Transport):
     async def connect(self) -> None:
         # On Windows, CreateProcess needs the resolved *.cmd/*.exe path for
         # shims like npx/npm/uvx -- plain "npx" only works through a shell.
-        executable = shutil.which(self._command) or self._command
+        # Python MCP servers must use the host's active virtual environment,
+        # even when an unactivated shell would resolve "python" elsewhere.
+        if self._command in {"python", "python3"}:
+            executable = sys.executable
+        else:
+            executable = shutil.which(self._command) or self._command
         self._process = await asyncio.create_subprocess_exec(
             executable,
             *self._args,
