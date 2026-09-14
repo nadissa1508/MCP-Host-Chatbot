@@ -74,29 +74,39 @@ class StdioTransport(Transport):
     async def receive(self) -> dict[str, Any] | None:
         if self._process is None or self._process.stdout is None:
             return None
-        line = await self._process.stdout.readline()
-        if not line:
-            return None
-        try:
-            return decode_frame(line)
-        except JsonRpcError:
-            # A malformed line from the child process; skip it rather than
-            # tearing down the whole connection over one bad frame.
-            return None
+        while True:
+            line = await self._process.stdout.readline()
+            if not line:
+                return None
+            try:
+                return decode_frame(line)
+            except JsonRpcError:
+                # A malformed line is not EOF. Keep reading so one invalid
+                # frame cannot make the client report that the server closed.
+                continue
 
     async def close(self) -> None:
         if self._process is None:
             return
         if self._process.stdin is not None:
             self._process.stdin.close()
+            with suppress(BrokenPipeError, ConnectionResetError):
+                await self._process.stdin.wait_closed()
         if self._stderr_task is not None:
             self._stderr_task.cancel()
+            await asyncio.gather(self._stderr_task, return_exceptions=True)
         if self._process.returncode is None:
             try:
                 self._process.terminate()
             except ProcessLookupError:
                 pass
-        await self._process.wait()
+        try:
+            await asyncio.wait_for(self._process.wait(), timeout=3.0)
+        except asyncio.TimeoutError:
+            self._process.kill()
+            await self._process.wait()
+        self._process = None
+        self._stderr_task = None
 
     @property
     def is_connected(self) -> bool:
