@@ -25,6 +25,11 @@ class JsonRpcError(Exception):
         self.message = message
         self.data = data
 
+    def __str__(self) -> str:
+        if self.data is None:
+            return self.message
+        return f"{self.message}: {self.data}"
+
     def to_dict(self) -> dict[str, Any]:
         error: dict[str, Any] = {"code": self.code, "message": self.message}
         if self.data is not None:

@@ -103,13 +103,31 @@ def parse_message(raw: dict[str, Any]) -> JsonRpcMessage:
     has_result = "result" in raw
     has_error = "error" in raw
 
+    if has_method:
+        if not isinstance(raw["method"], str) or has_result or has_error:
+            raise JsonRpcError.invalid_request(raw)
+        if "params" in raw and not isinstance(raw["params"], (dict, list)):
+            raise JsonRpcError.invalid_request(raw)
+        if has_id and not _is_valid_id(raw["id"]):
+            raise JsonRpcError.invalid_request(raw)
+
+    if has_result and has_error:
+        raise JsonRpcError.invalid_request(raw)
+    if has_id and not _is_valid_id(raw["id"]):
+        raise JsonRpcError.invalid_request(raw)
+
     if has_method and has_id:
         return JsonRpcRequest(method=raw["method"], id=raw["id"], params=raw.get("params"))
     if has_method and not has_id:
         return JsonRpcNotification(method=raw["method"], params=raw.get("params"))
     if has_error and has_id:
         err = raw["error"]
-        if not isinstance(err, dict) or "code" not in err or "message" not in err:
+        if (
+            not isinstance(err, dict)
+            or not isinstance(err.get("code"), int)
+            or isinstance(err.get("code"), bool)
+            or not isinstance(err.get("message"), str)
+        ):
             raise JsonRpcError.invalid_request(raw)
         return JsonRpcErrorResponse(
             id=raw["id"],
@@ -119,3 +137,10 @@ def parse_message(raw: dict[str, Any]) -> JsonRpcMessage:
         return JsonRpcResponse(id=raw["id"], result=raw["result"])
 
     raise JsonRpcError.invalid_request(raw)
+
+
+def _is_valid_id(value: Any) -> bool:
+    """Return whether a value is permitted in a JSON-RPC id field."""
+    return value is None or isinstance(value, str) or (
+        isinstance(value, int) and not isinstance(value, bool)
+    )

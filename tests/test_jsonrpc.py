@@ -62,6 +62,22 @@ def test_parse_message_rejects_shape_with_neither_result_nor_error():
     assert exc_info.value.code == INVALID_REQUEST
 
 
+@pytest.mark.parametrize(
+    "message",
+    [
+        {"jsonrpc": "2.0", "id": 1, "result": {}, "error": {"code": -1, "message": "x"}},
+        {"jsonrpc": "2.0", "id": True, "method": "ping"},
+        {"jsonrpc": "2.0", "id": 1, "method": 123},
+        {"jsonrpc": "2.0", "id": 1, "method": "ping", "params": "invalid"},
+        {"jsonrpc": "2.0", "id": 1, "method": "ping", "result": {}},
+    ],
+)
+def test_parse_message_rejects_invalid_json_rpc_shapes(message):
+    with pytest.raises(JsonRpcError) as exc_info:
+        parse_message(message)
+    assert exc_info.value.code == INVALID_REQUEST
+
+
 def test_id_generator_is_monotonic_and_unique():
     ids = IdGenerator(start=1)
     values = [ids.next() for _ in range(5)]
