@@ -57,22 +57,26 @@ class MCPClient:
 
     async def start(self) -> None:
         """Connect the transport, run the MCP handshake and cache the tool list."""
-        await self.transport.connect()
-        self._reader_task = asyncio.create_task(self._read_loop())
+        try:
+            await self.transport.connect()
+            self._reader_task = asyncio.create_task(self._read_loop())
 
-        init_result = await self._request(
-            METHOD_INITIALIZE,
-            {
-                "protocolVersion": PROTOCOL_VERSION,
-                "capabilities": CLIENT_CAPABILITIES,
-                "clientInfo": {"name": CLIENT_NAME, "version": CLIENT_VERSION},
-            },
-        )
-        self.server_info = InitializeResult.from_dict(init_result)
-        await self._notify(METHOD_INITIALIZED, {})
+            init_result = await self._request(
+                METHOD_INITIALIZE,
+                {
+                    "protocolVersion": PROTOCOL_VERSION,
+                    "capabilities": CLIENT_CAPABILITIES,
+                    "clientInfo": {"name": CLIENT_NAME, "version": CLIENT_VERSION},
+                },
+            )
+            self.server_info = InitializeResult.from_dict(init_result)
+            await self._notify(METHOD_INITIALIZED, {})
 
-        list_result = await self._request(METHOD_TOOLS_LIST, {})
-        self.tools = [Tool.from_dict(t) for t in list_result.get("tools", [])]
+            list_result = await self._request(METHOD_TOOLS_LIST, {})
+            self.tools = [Tool.from_dict(t) for t in list_result.get("tools", [])]
+        except Exception:
+            await self.close()
+            raise
 
     async def call_tool(self, name: str, arguments: dict[str, Any]) -> ToolResult:
         result = await self._request(METHOD_TOOLS_CALL, {"name": name, "arguments": arguments})
@@ -84,9 +88,12 @@ class MCPClient:
     async def close(self) -> None:
         if self._reader_task is not None:
             self._reader_task.cancel()
+            await asyncio.gather(self._reader_task, return_exceptions=True)
+            self._reader_task = None
         for future in self._pending.values():
             if not future.done():
                 future.cancel()
+        self._pending.clear()
         await self.transport.close()
 
     async def _request(self, method: str, params: dict[str, Any]) -> dict[str, Any]:
@@ -95,11 +102,13 @@ class MCPClient:
         future: asyncio.Future = asyncio.get_running_loop().create_future()
         self._pending[request_id] = future
 
-        await self._send(request.to_dict())
         try:
+            await self._send(request.to_dict())
             return await asyncio.wait_for(future, timeout=self._timeout)
         finally:
             self._pending.pop(request_id, None)
+            if not future.done():
+                future.cancel()
 
     async def _notify(self, method: str, params: dict[str, Any]) -> None:
         notification = JsonRpcNotification(method=method, params=params)
@@ -111,19 +120,26 @@ class MCPClient:
         await self.transport.send(message)
 
     async def _read_loop(self) -> None:
-        while True:
-            message = await self.transport.receive()
-            if message is None:
-                self._fail_all_pending(ConnectionError(f"server '{self.name}' closed the connection"))
-                return
+        try:
+            while True:
+                message = await self.transport.receive()
+                if message is None:
+                    self._fail_all_pending(
+                        ConnectionError(f"server '{self.name}' closed the connection")
+                    )
+                    return
 
-            if self._on_frame:
-                self._on_frame("recv", self.name, message)
+                if self._on_frame:
+                    self._on_frame("recv", self.name, message)
 
-            if "id" in message and ("result" in message or "error" in message):
-                self._resolve_pending(message)
-            # Server-initiated requests/notifications (e.g. logging messages)
-            # are logged via on_frame above; this client does not act on them.
+                if "id" in message and ("result" in message or "error" in message):
+                    self._resolve_pending(message)
+                # Server-initiated requests/notifications (e.g. logging messages)
+                # are logged via on_frame above; this client does not act on them.
+        except asyncio.CancelledError:
+            raise
+        except Exception as exc:  # noqa: BLE001 - propagate transport failure to requests
+            self._fail_all_pending(exc)
 
     def _resolve_pending(self, message: dict[str, Any]) -> None:
         request_id = message["id"]
