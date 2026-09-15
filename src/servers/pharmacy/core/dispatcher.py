@@ -35,11 +35,12 @@ class Dispatcher:
     def __init__(self) -> None:
         self._tools = {tool.name: tool for tool in TOOLS}
 
-    def handle(self, raw_message: dict[str, Any]) -> dict[str, Any] | None:
+    def handle(self, raw_message: Any) -> dict[str, Any] | None:
         try:
             message = parse_message(raw_message)
         except JsonRpcError as exc:
-            return JsonRpcErrorResponse(id=raw_message.get("id"), error=exc).to_dict()
+            request_id = raw_message.get("id") if isinstance(raw_message, dict) else None
+            return JsonRpcErrorResponse(id=request_id, error=exc).to_dict()
 
         if isinstance(message, JsonRpcNotification):
             self._handle_notification(message)
@@ -51,6 +52,9 @@ class Dispatcher:
                 return JsonRpcResponse(id=message.id, result=result).to_dict()
             except JsonRpcError as exc:
                 return JsonRpcErrorResponse(id=message.id, error=exc).to_dict()
+            except Exception as exc:  # noqa: BLE001 - keep the JSON-RPC boundary intact
+                error = JsonRpcError.internal_error(str(exc))
+                return JsonRpcErrorResponse(id=message.id, error=error).to_dict()
 
         # Responses/errors addressed to us are not expected; ignore them.
         return None
@@ -61,15 +65,25 @@ class Dispatcher:
         return None
 
     def _handle_request(self, request: JsonRpcRequest) -> dict[str, Any]:
+        params = self._object_params(request)
         if request.method == METHOD_INITIALIZE:
             return self._initialize()
         if request.method == METHOD_TOOLS_LIST:
             return {"tools": [tool.to_schema() for tool in self._tools.values()]}
         if request.method == METHOD_TOOLS_CALL:
-            return self._tools_call(request.params or {})
+            return self._tools_call(params)
         if request.method == METHOD_PING:
             return {}
         raise JsonRpcError.method_not_found(request.method)
+
+    @staticmethod
+    def _object_params(request: JsonRpcRequest) -> dict[str, Any]:
+        """Require object-shaped params for the MCP methods implemented here."""
+        if request.params is None:
+            return {}
+        if not isinstance(request.params, dict):
+            raise JsonRpcError.invalid_params("MCP params must be a JSON object")
+        return request.params
 
     def _initialize(self) -> dict[str, Any]:
         return {
