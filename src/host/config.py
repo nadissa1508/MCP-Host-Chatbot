@@ -11,6 +11,13 @@ DEFAULT_SERVERS_PATH = Path("config/servers.json")
 DEFAULT_ENV_PATH = Path(".env")
 
 
+def _resolve_env_reference(value: str | None) -> str | None:
+    """Resolve a whole-string ${NAME} reference without expanding arbitrary text."""
+    if value and value.startswith("${") and value.endswith("}"):
+        return os.environ.get(value[2:-1])
+    return value
+
+
 @dataclass
 class ServerConfig:
     name: str
@@ -28,7 +35,7 @@ class ServerConfig:
             enabled=raw.get("enabled", True),
             command=raw.get("command"),
             args=raw.get("args"),
-            url=raw.get("url"),
+            url=_resolve_env_reference(raw.get("url")),
         )
 
 

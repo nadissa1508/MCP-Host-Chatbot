@@ -12,6 +12,7 @@ from typing import Any
 from src.llm.anthropic_api import tool_to_anthropic_schema
 from src.mcp.client import MCPClient
 from src.mcp.models import ToolResult
+from src.protocol.errors import JsonRpcError
 
 NAMESPACE_SEPARATOR = "__"
 
@@ -42,7 +43,13 @@ class ToolRegistry:
             return ToolResult.text_result(f"Unknown tool: {namespaced_name}", is_error=True)
         server_name, original_name = route
         client = self._clients[server_name]
-        return await client.call_tool(original_name, arguments)
+        try:
+            return await client.call_tool(original_name, arguments)
+        except (ConnectionError, TimeoutError, JsonRpcError) as exc:
+            return ToolResult.text_result(
+                f"The MCP server '{server_name}' could not complete the tool call: {exc}",
+                is_error=True,
+            )
 
     def server_names(self) -> list[str]:
         return list(self._clients.keys())

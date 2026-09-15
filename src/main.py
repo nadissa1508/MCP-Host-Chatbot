@@ -53,7 +53,14 @@ async def _handle_command(host: Host, command: str) -> bool:
         for tool in host.registry.to_anthropic_tools():
             print(f"  {tool['name']}: {tool['description']}")
     elif name == "/log":
-        count = int(parts[1]) if len(parts) > 1 else 10
+        try:
+            count = int(parts[1]) if len(parts) > 1 else 10
+        except ValueError:
+            print("Uso: /log [cantidad]")
+            return True
+        if count < 1:
+            print("La cantidad debe ser un número entero mayor que cero.")
+            return True
         entries = host.logger.recent(count)
         print(format_recent(entries) if entries else "(todavía no hay frames MCP registrados)")
     elif name == "/clear":
@@ -89,7 +96,11 @@ async def run() -> None:
                     break
                 continue
 
-            reply = await host.agent_loop.run_turn(text)
+            try:
+                reply = await host.agent_loop.run_turn(text)
+            except Exception as exc:  # noqa: BLE001 - keep the interactive session alive
+                print(f"Error al procesar el mensaje: {exc}\n")
+                continue
             print(f"asistente> {reply}\n")
     finally:
         await host.shutdown()
@@ -101,7 +112,6 @@ def main() -> None:
     except KeyboardInterrupt:
         # Ctrl+C is an expected way to leave an interactive terminal program.
         print("\nHasta luego.")
-
 
 if __name__ == "__main__":
     main()

@@ -14,6 +14,7 @@ from src.llm.anthropic_api import AnthropicClient
 from src.mcp.client import MCPClient
 from src.mcp.transports.base import Transport
 from src.mcp.transports.stdio import StdioTransport
+from src.mcp.transports.streamable_http import StreamableHttpTransport
 from src.observability.mcp_log import MCPLogger
 
 SYSTEM_PROMPT = (
@@ -30,6 +31,10 @@ def _build_transport(config: ServerConfig) -> Transport:
         if not config.command:
             raise ValueError(f"server '{config.name}' is stdio but has no command")
         return StdioTransport(command=config.command, args=config.args or [])
+    if config.transport == "http":
+        if not config.url:
+            raise ValueError(f"server '{config.name}' is http but has no url")
+        return StreamableHttpTransport(url=config.url)
     raise NotImplementedError(
         f"server '{config.name}' uses transport '{config.transport}', "
         "which is not wired up in this build"
@@ -56,7 +61,7 @@ class Host:
     async def _connect_server(self, server_config: ServerConfig) -> None:
         try:
             transport = _build_transport(server_config)
-        except NotImplementedError as exc:
+        except (NotImplementedError, ValueError) as exc:
             self._connect_errors[server_config.name] = str(exc)
             return
 
@@ -64,6 +69,7 @@ class Host:
         try:
             await client.start()
         except Exception as exc:  # noqa: BLE001 - surface any startup failure to the user
+            await client.close()
             self._connect_errors[server_config.name] = f"{type(exc).__name__}: {exc}"
             print(f"[host] no se pudo iniciar el servidor '{server_config.name}': {exc}", file=sys.stderr)
             return
