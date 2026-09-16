@@ -16,8 +16,13 @@ This document is the tool-level API reference. For the protocol-level detail
   Reads one JSON-RPC request per line from stdin, writes one JSON-RPC
   response per line to stdout. No banner, no extra output — anything on
   stdout that isn't a JSON-RPC frame would break the protocol.
-- **Remote (Streamable HTTP):** see the "Remote deployment" section of the
-  README once `http_server.py` is deployed (second delivery of this project).
+- **Remote (Streamable HTTP):** `python -m src.servers.pharmacy.http_server`
+  (or `uvicorn src.servers.pharmacy.http_server:app --port 8080`). Same
+  `Dispatcher` as the stdio entrypoint, exposed over a single `POST /mcp`
+  endpoint (plus `DELETE /mcp` to end a session and `GET /healthz` for
+  liveness checks). This is what runs inside the Docker image
+  (`src/servers/pharmacy/Dockerfile`) once deployed to Cloud Run — see
+  "Streamable HTTP endpoint" below for the wire-level detail.
 
 ## MCP lifecycle
 
@@ -156,6 +161,90 @@ insufficient.
 Note `isError` stays `false` here: the interaction was checked
 successfully, it just came back unsafe. `isError: true` is reserved for
 tool *execution* failures (unknown SKU, missing prescription, no stock).
+
+## Streamable HTTP endpoint
+
+`src/servers/pharmacy/http_server.py` exposes the same `Dispatcher` used by
+the stdio entrypoint over a single endpoint, so the host talks to it
+identically whether it's running as a local subprocess or a remote
+container — only `config/servers.json`'s `transport`/`url` change.
+
+| Method | Path | Purpose |
+|---|---|---|
+| `POST` | `/mcp` | Send one JSON-RPC message (request or notification) |
+| `DELETE` | `/mcp` | End the current MCP session |
+| `GET` | `/status` | Liveness check, returns `200 ok` |
+
+Note: the liveness route is `/status` rather than `/healthz` — Google's
+front-end infrastructure intercepts the exact path `/healthz` as a reserved
+internal health-check path and never forwards it to the container (it
+returns a generic Google 404 page instead of reaching the app), which was
+confirmed by comparing responses across several paths against the live
+Cloud Run deployment.
+
+Session handling:
+
+- The response to an `initialize` request carries an `Mcp-Session-Id`
+  header (a fresh UUID); every later request on that session must echo it
+  back in the same header.
+- Requests after initialization also carry `MCP-Protocol-Version:
+  2025-06-18`, making the negotiated protocol version explicit at the HTTP
+  layer.
+- A request with a missing or unrecognized `Mcp-Session-Id` gets
+  `404 Not Found` — this is the client's signal to re-initialize.
+- `DELETE /mcp` with a valid session id forgets that session and returns
+  `204 No Content`.
+
+Response shape:
+
+- A **notification** (no `id` in the request body) gets `202 Accepted`
+  with an empty body — there is nothing to reply with.
+- A **request** (has `id`) gets `200 OK` with `Content-Type:
+  text/event-stream` and a single `event: message` / `data: <json>` block
+  carrying the JSON-RPC response. The server does not open a standalone
+  server-push stream (`GET /mcp`) — this server never sends unsolicited
+  messages, so that part of the Streamable HTTP spec isn't needed here.
+
+Run it locally with `python -m src.servers.pharmacy.http_server` (reads
+`PORT` from the environment, defaults to `8080`), set
+`PHARMACY_REMOTE_URL=http://127.0.0.1:8080/mcp` in `.env`, and enable the
+`pharmacy-remote` entry to exercise the exact same code path the actual
+remote deployment uses.
+
+### Container image
+
+`src/servers/pharmacy/Dockerfile` builds a minimal image containing only
+the subtree `http_server.py` actually imports (`src/protocol/`, the two MCP
+constant/model modules it needs, and the pharmacy server itself) plus its
+own `requirements.txt` (`starlette`, `uvicorn`) — no `httpx`, no stdio
+transport, nothing the remote entrypoint doesn't use. Build from the repo
+root so the `src/servers/pharmacy/...` paths in the Dockerfile resolve.
+`.dockerignore` and `.gcloudignore` keep `.env`, credentials, logs,
+captures, reports and local reference files out of the build context:
+
+```bash
+docker build -f src/servers/pharmacy/Dockerfile -t pharmacy-mcp .
+docker run --rm -p 8080:8080 pharmacy-mcp
+```
+
+### Live deployment
+
+This image is deployed on **Google Cloud Run**. Its public `/mcp` URL is
+configured through `PHARMACY_REMOTE_URL` in the local `.env` file rather
+than committed to source control. The service uses
+`--allow-unauthenticated` because this is a course project with synthetic
+pharmacy data — not a pattern to follow for a service handling real data.
+It was built and deployed via Cloud Build from `cloudbuild.yaml` at the repo
+root, without needing Docker installed on the deploying machine:
+
+```bash
+gcloud builds submit --config cloudbuild.yaml .
+gcloud run deploy pharmacy-mcp \
+  --image gcr.io/PROJECT_ID/pharmacy-mcp \
+  --region us-central1 \
+  --allow-unauthenticated \
+  --port 8080
+```
 
 ## Sample SKUs for testing
 
