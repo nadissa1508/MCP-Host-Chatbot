@@ -17,15 +17,15 @@
     {
       "name": "pharmacy",
       "transport": "stdio",
-      "enabled": true,
+      "enabled": false,
       "command": "python",
       "args": ["-m", "src.servers.pharmacy.stdio_server"]
     },
     {
       "name": "pharmacy-remote",
       "transport": "http",
-      "enabled": false,
-      "url": "https://your-cloud-run-service.a.run.app/mcp"
+      "enabled": true,
+      "url": "${PHARMACY_REMOTE_URL}"
     }
   ]
 }
