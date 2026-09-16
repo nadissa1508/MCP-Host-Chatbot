@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
+import ssl
 from contextlib import suppress
 from typing import Any
 
@@ -25,6 +27,19 @@ from src.protocol.errors import JsonRpcError
 
 SESSION_HEADER = "Mcp-Session-Id"
 PROTOCOL_VERSION_HEADER = "MCP-Protocol-Version"
+
+
+def _build_ssl_context() -> ssl.SSLContext | bool:
+    """Log the TLS session keys to SSLKEYLOGFILE when it's set, so a capture
+    of this traffic can be decrypted in Wireshark (Wireshark analysis
+    deliverable). No-op in every other run: httpx's own default TLS
+    verification is used when the variable isn't set."""
+    keylog_path = os.environ.get("SSLKEYLOGFILE")
+    if not keylog_path:
+        return True
+    context = ssl.create_default_context()
+    context.keylog_filename = keylog_path
+    return context
 
 
 class StreamableHttpTransport(Transport):
@@ -42,7 +57,7 @@ class StreamableHttpTransport(Transport):
         self._closed = False
         self._session_id = None
         self._inbox = asyncio.Queue()
-        self._client = httpx.AsyncClient(timeout=self._timeout)
+        self._client = httpx.AsyncClient(timeout=self._timeout, verify=_build_ssl_context())
 
     async def send(self, message: dict[str, Any]) -> None:
         if self._client is None:

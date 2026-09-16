@@ -19,7 +19,7 @@ This document is the tool-level API reference. For the protocol-level detail
 - **Remote (Streamable HTTP):** `python -m src.servers.pharmacy.http_server`
   (or `uvicorn src.servers.pharmacy.http_server:app --port 8080`). Same
   `Dispatcher` as the stdio entrypoint, exposed over a single `POST /mcp`
-  endpoint (plus `DELETE /mcp` to end a session and `GET /healthz` for
+  endpoint (plus `DELETE /mcp` to end a session and `GET /status` for
   liveness checks). This is what runs inside the Docker image
   (`src/servers/pharmacy/Dockerfile`) once deployed to Cloud Run — see
   "Streamable HTTP endpoint" below for the wire-level detail.

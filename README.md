@@ -36,8 +36,18 @@ Built for the CC3067 Redes course at UVG. This repository implements the course'
   `config/servers.json` and
   [`docs/pharmacy-mcp-spec.md`](docs/pharmacy-mcp-spec.md#streamable-http-endpoint).
 
-The Wireshark protocol capture and analysis are scoped for the second
-delivery.
+- The communication between the host and the remote pharmacy server was
+  captured and decrypted with Wireshark (TLS session keys logged via
+  `SSLKEYLOGFILE`, supported in `StreamableHttpTransport`) and classified
+  into sync/request/response messages, with a layer-by-layer (link,
+  network, transport, application) breakdown — see
+  [`docs/wireshark-capture.md`](docs/wireshark-capture.md) for how to
+  reproduce the capture, `captures/` for the `.pcapng` and screenshots,
+  and `report/` for the full write-up.
+
+- A browser chatbot UI (`src/web/`, `python -m src.web.server`) wraps the
+  same `Host`/`AgentLoop` behind a WebSocket, with a single chat whose
+  theme switches live depending on which MCP server answers.
 
 ## Requirements
 
@@ -144,7 +154,9 @@ src/
   main.py      terminal entrypoint
 tests/         unit + integration tests (protocol, pharmacy tools, stdio and
                Streamable HTTP transports, the HTTP server itself)
-docs/          pharmacy server spec, demo scripts, (later) Wireshark analysis
+docs/          pharmacy server spec, demo scripts, Wireshark capture how-to
+report/        full project report (spec, Wireshark layer analysis, conclusions)
+captures/      Wireshark .pcapng and screenshots
 config/        MCP server registry (servers.json)
 ```
 
