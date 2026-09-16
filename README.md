@@ -63,10 +63,12 @@ cp .env.example .env
 ```
 
 `config/servers.json` lists the MCP servers the host connects to on start.
-By default it enables `filesystem`, `git` and `pharmacy` (all local/stdio)
-and disables `pharmacy-remote`. Set `PHARMACY_REMOTE_URL` in `.env` to the
-deployed `/mcp` endpoint, then flip `pharmacy` off and `pharmacy-remote` on
-to use the remote server instead, with no code changes.
+This delivery is graded on the **remote** pharmacy server, so by default it
+enables `filesystem`, `git` (local/stdio) and `pharmacy-remote` (Streamable
+HTTP, pointed at the deployed Cloud Run service via `PHARMACY_REMOTE_URL` in
+`.env`), and disables the local `pharmacy` entry. To run the pharmacy server
+locally instead, flip `pharmacy` on and `pharmacy-remote` off — no code
+changes needed either way, both entries drive the exact same `Dispatcher`.
 
 ## Run
 
@@ -97,6 +99,23 @@ you> I've had a runny nose and sore throat for 2 days, I'm 24, allergic to parac
 
 Anything else is sent to the assistant.
 
+## Web UI
+
+The same `Host`/`AgentLoop` used by the terminal also runs behind a small
+browser chatbot (`src/web/`): a Starlette app with one WebSocket for the
+chat, wrapping the exact same agent loop with no changes to the MCP layer.
+
+```bash
+python -m src.web.server   # serves on http://0.0.0.0:8000
+```
+
+It's a single chat window whose theme switches live depending on which MCP
+server is actually doing the work: blue/white and minimal for `filesystem`
+and `git`, and a pharmacy-branded look (inspired by a real Guatemalan
+pharmacy chain's site) the moment a `pharmacy`/`pharmacy-remote` tool call
+happens — tool-call badges stream in as they occur, taken from the same
+`on_frame` hook the terminal's `/log` command reads.
+
 ### Trying the remote (HTTP) pharmacy server locally
 
 ```bash
@@ -121,6 +140,7 @@ src/
   host/        the host: config, tool registry, conversation, agent loop
   servers/pharmacy/  the custom MCP server: domain logic, data, dispatcher,
                      stdio_server.py (local) and http_server.py (remote)
+  web/         browser chatbot UI: Starlette + WebSocket wrapping the Host
   main.py      terminal entrypoint
 tests/         unit + integration tests (protocol, pharmacy tools, stdio and
                Streamable HTTP transports, the HTTP server itself)

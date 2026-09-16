@@ -11,6 +11,7 @@ from __future__ import annotations
 import asyncio
 import shutil
 import sys
+from contextlib import suppress
 from typing import Any, Callable
 
 from src.mcp.transports.base import Transport

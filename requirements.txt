@@ -3,5 +3,11 @@ rich>=13.0
 # Official third-party MCP server used by the host. The project's own MCP
 # client and pharmacy server remain implemented without an MCP SDK.
 mcp-server-git>=2025.7.1,<2027
+# Web chatbot UI (src/web/): a Starlette app + WebSocket wrapping the same
+# Host used by the terminal REPL. Not an MCP SDK - it never touches the
+# JSON-RPC/MCP layer, only serves the browser frontend.
+starlette>=0.38
+uvicorn>=0.30
+websockets>=13.0
 pytest>=8.0
 pytest-asyncio>=0.24

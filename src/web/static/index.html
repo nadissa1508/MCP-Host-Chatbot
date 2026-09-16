@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MCP Host Chatbot</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body data-theme="dev">
+
+  <div class="topstrip">
+    <span id="topstrip-text">un solo chat &middot; el tema cambia según el servidor MCP que responde</span>
+    <div class="server-pills" id="server-pills"></div>
+  </div>
+
+  <div class="theme-stripe" id="theme-stripe"></div>
+
+  <header class="chat-header">
+    <div class="header-icon" id="header-icon" aria-hidden="true">
+      <svg id="icon-dev" viewBox="0 0 24 24" fill="none"><path d="M4 5h16a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H9l-4 4v-4H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"/></svg>
+      <svg id="icon-pharmacy" viewBox="0 0 24 24" fill="none" style="display:none"><path d="M4 20 11 5l3 7 2-4 4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="header-text">
+      <div class="header-title" id="header-title">MCP Assistant</div>
+      <div class="header-subtitle" id="header-subtitle">Host de consola con acceso a herramientas MCP</div>
+    </div>
+    <span class="online-pill" id="online-pill">
+      <span class="dot"></span><span id="online-text">En línea</span>
+    </span>
+  </header>
+
+  <main class="chat-body" id="chat-body">
+    <div class="chat-scroll" id="chat-scroll"></div>
+  </main>
+
+  <form class="chat-input-bar" id="chat-form">
+    <input type="text" id="chat-input" autocomplete="off" placeholder="Escribe un mensaje…" aria-label="Mensaje">
+    <button type="submit" id="send-btn" aria-label="Enviar">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none"><path d="M4 12h15M13 6l6 6-6 6" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </form>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
