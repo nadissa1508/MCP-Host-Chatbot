@@ -1,0 +1,2 @@
+starlette>=0.38
+uvicorn[standard]>=0.30

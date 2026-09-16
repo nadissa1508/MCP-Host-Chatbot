@@ -227,3 +227,7 @@ captures/*
 workspace/*
 !workspace/.gitkeep
 sslkeys.log
+
+# Local assignment and recovery reference files
+archivos de instrucciones/
+archivos a revisar/

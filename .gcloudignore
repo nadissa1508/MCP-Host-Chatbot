@@ -1,0 +1,19 @@
+.gcloudignore
+.git
+.gitignore
+.env
+.env.*
+.venv
+__pycache__
+*.py[cod]
+.pytest_cache
+logs
+captures
+workspace
+docs
+report
+tests
+archivos de instrucciones
+archivos a revisar
+README.md
+

@@ -1,0 +1,11 @@
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - build
+      - -f
+      - src/servers/pharmacy/Dockerfile
+      - -t
+      - gcr.io/$PROJECT_ID/pharmacy-mcp
+      - .
+images:
+  - gcr.io/$PROJECT_ID/pharmacy-mcp
